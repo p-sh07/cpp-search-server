@@ -1,8 +1,3 @@
-// Решите загадку: Сколько чисел от 1 до 1000 содержат как минимум одну цифру 3?
-// Напишите ответ здесь:
-// 271
-// Закомитьте изменения и отправьте их в свой репозиторий.
-
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -56,10 +51,6 @@ struct Document {
 
 class SearchServer {
 public:
-    void SetDocNumber(int doc_num) {
-        doc_word_data_ = vector<int>(doc_num, 0);
-    }
-    
     void SetStopWords(const string& text) {
         for (const string& word : SplitIntoWords(text)) {
             stop_words_.insert(word);
@@ -94,12 +85,13 @@ public:
     }
 
 private:
-    vector<int> doc_word_data_; // doc count = doc_word_data_.size();
+    // doc count = doc_word_data_.size();
+    vector<int> doc_word_data_;
     //map <word -> map<docId, count> >
     map<string, map<int, int>> word_index_;
     set<string> stop_words_;
     
-    //inverse document frequency (for word in all docs)
+    //Inverse Document Frequency (per word per all docs)
     double get_idf(const string& word) const {
         if(word_index_.count(word) == 0)
             return 0;
@@ -107,21 +99,20 @@ private:
         return log(1.0 * get_total_doc_count()/get_word_in_docs_count(word));
     }
     
-    //term frequency (for query words in each document)
+    //Term Frequency (per word per document)
     double get_tf(int doc_id, int count) const {
-        //count total words in doc / divide by count in current document:
         if(doc_word_data_.size() <= doc_id) {
-            //the doc_id is outside of range stored in SearchServer
-            throw(std::out_of_range(""));
-        }
-        //divide the times count in the doc by total words in the doc
+            throw(std::out_of_range("the doc_id is outside of range stored in SearchServer"));
+        } //count in doc / total words in doc :
         return 1.0*count/double(doc_word_data_[doc_id]);
     }
     
+    //return total number of stored documents
     int get_total_doc_count() const {
         return int(doc_word_data_.size());
     }
     
+    //return number of docs containing word
     int get_word_in_docs_count(const string& word) const {
         if(word_index_.count(word) == 0) {
             return 0;
@@ -129,19 +120,30 @@ private:
         return int(word_index_.at(word).size());
     }
     
-    bool IsStopWord(const string& word) const {
-        return stop_words_.count(word) > 0;
+    //return list of docs containing at least one minus word
+    set<int> get_minus_docs(const set<string>& minus_words) const {
+        set<int> minus_list;
+        for(const auto& word : minus_words) {
+            if(word_index_.count(word) != 0) {
+                for(const auto [docId, count] : word_index_.at(word))
+                minus_list.insert(docId);
+            }
+        }
+        return minus_list;
     }
     
+    //upd for minus words
+    bool IsStopWord(const string& word) const {
+        //(word starts with '=' AND is a stop word) OR is a stop word
+        return (word[0] == '-' && stop_words_.count(word.substr(1)) > 0) 
+        || stop_words_.count(word) > 0;
+    }
+    
+    //ignores stop words, even with a '-' suffix
     vector<string> SplitIntoWordsNoStop(const string& text) const {
         vector<string> words;
-        //will ignore stop words even if with a '-' suffix
         for (const string& word :  SplitIntoWords(text)) {
-            //is a minus word, check that it is not a stop word
-            if(word[0] == '-' && !IsStopWord(word.substr(1))) {
-                words.push_back(word);
-            } //no minus and not a stop word
-            else if (!IsStopWord(word)) {
+            if (!IsStopWord(word)) {
                 words.push_back(word);
             }
         }
@@ -150,57 +152,39 @@ private:
 
     set<string> ParseQuery(const string& text, set<string>& minusWords) const {
         set<string> query_words;
-        
         for (const string& word : SplitIntoWordsNoStop(text)) {
             //found a minus-word
-            if(word[0] == '-') {
-                //cut off the -
+            if(word[0] == '-') { //cut off the -
                 minusWords.insert(word.substr(1));
-            }
-            else {
+            } else {
                 query_words.insert(word);
             }
         }
         return query_words;
     }
   
-    vector<Document> FindAllDocumentsNoMinus(const set<string>& query_words, const set<string>& minus_words) const
-    {
-        //exclude minus words first?
-        set<int> minus_list;
-        //remove docs with minus words
-        for(const auto& word : minus_words) {
-            if(word_index_.count(word) != 0) {
-                for(const auto [docId, count] : word_index_.at(word))
-                minus_list.insert(docId);
-            }
-        }
-        //find all relevant documents
+    vector<Document> FindAllDocumentsNoMinus(const set<string>& query_words, const set<string>& minus_words) const {
+        set<int> minus_list = get_minus_docs(minus_words);
         map<int, double> id_relevance;
+        //process each query word in turn
         for(const auto& word : query_words) {
             if(word_index_.count(word) != 0) {
-                //the word is contained in at least 1 document, so get idf, once per word
-                double idf = get_idf(word);
-                //for every word match increase relevance
+                double IDF = get_idf(word); //once per word
                 for(const auto& [docId, count] : word_index_.at(word)) {
-                    //no minus words in doc
+                    //don't calculate for minus-list docs
                     if(minus_list.count(docId) == 0) {
-                        //find the tf in this particular document, once per word per doc
-                        double tf = get_tf(docId, count);
-                        //relevance is sum of TF * IDF for each word in query
-                        id_relevance[docId] += idf*tf;
+                        double TF = get_tf(docId, count);
+                        id_relevance[docId] += IDF*TF;
                     }
                 }
             }
         }
-        //transform into a vector
+        //transform id_relevance map into a vector of Documents
         vector<Document> matched_documents;
         matched_documents.reserve(id_relevance.size());
-        
         for(const auto&[id, relevance] : id_relevance) {
             matched_documents.push_back({id, relevance});
         }
-        
         return matched_documents;
     }
 };
