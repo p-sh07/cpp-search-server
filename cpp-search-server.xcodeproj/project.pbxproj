@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0CCE6D5E2B0AAE9B00A37402 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CCE6D5D2B0AAE9B00A37402 /* main.cpp */; };
-		0CCE6D662B0CF41000A37402 /* sample_code.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CCE6D642B0CF41000A37402 /* sample_code.cpp */; };
+		0C118E3A2B0D17830015F0B6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C118E392B0D17830015F0B6 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0CCE6D582B0AAE9B00A37402 /* CopyFiles */ = {
+		0C118E352B0D17830015F0B6 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -24,13 +23,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0CCE6D5A2B0AAE9B00A37402 /* cppSearchServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cppSearchServer; sourceTree = BUILT_PRODUCTS_DIR; };
-		0CCE6D5D2B0AAE9B00A37402 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		0CCE6D642B0CF41000A37402 /* sample_code.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sample_code.cpp; sourceTree = "<group>"; };
+		0C118E372B0D17830015F0B6 /* cpp-search-server */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cpp-search-server"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C118E392B0D17830015F0B6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		0CCE6D572B0AAE9B00A37402 /* Frameworks */ = {
+		0C118E342B0D17830015F0B6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -40,10 +38,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C118E382B0D17830015F0B6 /* cpp-search-server */ = {
+			isa = PBXGroup;
+			children = (
+				0C118E392B0D17830015F0B6 /* main.cpp */,
+			);
+			path = "cpp-search-server";
+			sourceTree = "<group>";
+		};
 		0CCE6D512B0AAE9B00A37402 = {
 			isa = PBXGroup;
 			children = (
-				0CCE6D5C2B0AAE9B00A37402 /* cppSearchServer */,
+				0C118E382B0D17830015F0B6 /* cpp-search-server */,
 				0CCE6D5B2B0AAE9B00A37402 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -51,38 +57,29 @@
 		0CCE6D5B2B0AAE9B00A37402 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0CCE6D5A2B0AAE9B00A37402 /* cppSearchServer */,
+				0C118E372B0D17830015F0B6 /* cpp-search-server */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		0CCE6D5C2B0AAE9B00A37402 /* cppSearchServer */ = {
-			isa = PBXGroup;
-			children = (
-				0CCE6D5D2B0AAE9B00A37402 /* main.cpp */,
-				0CCE6D642B0CF41000A37402 /* sample_code.cpp */,
-			);
-			path = cppSearchServer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0CCE6D592B0AAE9B00A37402 /* cppSearchServer */ = {
+		0C118E362B0D17830015F0B6 /* cpp-search-server */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0CCE6D612B0AAE9B00A37402 /* Build configuration list for PBXNativeTarget "cppSearchServer" */;
+			buildConfigurationList = 0C118E3B2B0D17830015F0B6 /* Build configuration list for PBXNativeTarget "cpp-search-server" */;
 			buildPhases = (
-				0CCE6D562B0AAE9B00A37402 /* Sources */,
-				0CCE6D572B0AAE9B00A37402 /* Frameworks */,
-				0CCE6D582B0AAE9B00A37402 /* CopyFiles */,
+				0C118E332B0D17830015F0B6 /* Sources */,
+				0C118E342B0D17830015F0B6 /* Frameworks */,
+				0C118E352B0D17830015F0B6 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = cppSearchServer;
-			productName = cppSearchServer;
-			productReference = 0CCE6D5A2B0AAE9B00A37402 /* cppSearchServer */;
+			name = "cpp-search-server";
+			productName = "cpp-search-server";
+			productReference = 0C118E372B0D17830015F0B6 /* cpp-search-server */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -94,12 +91,12 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					0CCE6D592B0AAE9B00A37402 = {
+					0C118E362B0D17830015F0B6 = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
 				};
 			};
-			buildConfigurationList = 0CCE6D552B0AAE9B00A37402 /* Build configuration list for PBXProject "cppSearchServer" */;
+			buildConfigurationList = 0CCE6D552B0AAE9B00A37402 /* Build configuration list for PBXProject "cpp-search-server" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -112,24 +109,39 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0CCE6D592B0AAE9B00A37402 /* cppSearchServer */,
+				0C118E362B0D17830015F0B6 /* cpp-search-server */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		0CCE6D562B0AAE9B00A37402 /* Sources */ = {
+		0C118E332B0D17830015F0B6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0CCE6D662B0CF41000A37402 /* sample_code.cpp in Sources */,
-				0CCE6D5E2B0AAE9B00A37402 /* main.cpp in Sources */,
+				0C118E3A2B0D17830015F0B6 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		0C118E3C2B0D17830015F0B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0C118E3D2B0D17830015F0B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		0CCE6D5F2B0AAE9B00A37402 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -245,39 +257,23 @@
 			};
 			name = Release;
 		};
-		0CCE6D622B0AAE9B00A37402 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		0CCE6D632B0AAE9B00A37402 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0CCE6D552B0AAE9B00A37402 /* Build configuration list for PBXProject "cppSearchServer" */ = {
+		0C118E3B2B0D17830015F0B6 /* Build configuration list for PBXNativeTarget "cpp-search-server" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0CCE6D5F2B0AAE9B00A37402 /* Debug */,
-				0CCE6D602B0AAE9B00A37402 /* Release */,
+				0C118E3C2B0D17830015F0B6 /* Debug */,
+				0C118E3D2B0D17830015F0B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0CCE6D612B0AAE9B00A37402 /* Build configuration list for PBXNativeTarget "cppSearchServer" */ = {
+		0CCE6D552B0AAE9B00A37402 /* Build configuration list for PBXProject "cpp-search-server" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0CCE6D622B0AAE9B00A37402 /* Debug */,
-				0CCE6D632B0AAE9B00A37402 /* Release */,
+				0CCE6D5F2B0AAE9B00A37402 /* Debug */,
+				0CCE6D602B0AAE9B00A37402 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
