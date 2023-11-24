@@ -68,11 +68,10 @@ public:
     void AddDocument(int document_id, const string& document) {
         ++no_of_docs;
         const auto doc_words = SplitIntoWordsNoStop(document);
-        int total_words_in_doc = accumulate(doc_words.begin(), doc_words.end(), 0, [](const auto prev, const auto word_count) {
-            return prev + word_count.second;
-        }); //build the inverse index for occurence
-        for(const auto& [word, count] : doc_words) {
-            word_index_[word][document_id] = ComputeTf(count, total_words_in_doc);
+        //build the inverse index for occurence
+        double inverse_total_word_count = 1.0/doc_words.size();
+        for(const auto& word : doc_words) {
+            word_index_[word][document_id] += inverse_total_word_count;
         }
     }
     
@@ -105,11 +104,6 @@ private:
             return 0;
         }//log(totalDocs/number of docs containing the word)
         return log(1.0 * GetTotalDocCount()/GetWordInDocsCount(word));
-    }
-    
-    //Term Frequency: word occurences / total words in doc
-    double ComputeTf(int term_count, int total_words) const {
-        return 1.0*term_count/total_words;
     }
     
     //return total number of stored documents
@@ -145,11 +139,11 @@ private:
     }
     
     //ignores stop words
-    map<string, int> SplitIntoWordsNoStop(const string& text) const {
-        map<string, int> words;
+    vector<string> SplitIntoWordsNoStop(const string& text) const {
+        vector<string> words;
         for (const string& word : SplitIntoWords(text)) {
             if (!IsStopWord(word)) {
-                ++words[word];
+                words.push_back(word);
             }
         }
         return words;
@@ -157,7 +151,7 @@ private:
     
     vector<QueryWord> ParseQuery(const string& text) const {
         vector<QueryWord> query_words;
-        for (const auto& [word, _ ] : SplitIntoWordsNoStop(text)) {
+        for (const auto& word : SplitIntoWordsNoStop(text)) {
             QueryWord qword(word);
             //found a minus-word
             if(qword.str[0] == '-') {
