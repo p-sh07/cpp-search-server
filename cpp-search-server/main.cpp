@@ -43,12 +43,18 @@ vector<string> SplitIntoWords(const string& text) {
 
     return words;
 }
-
+//---------------------------------------------------------//
 struct Document {
+    //default constructor
+    Document() : id(0), relevance(0), rating(0) {}
+    //parameter constructor
+    Document(int id, double relevance, int rating)
+    : id(id), relevance(relevance), rating(rating) {}
     int id;
     double relevance;
     int rating;
 };
+//---------------------------------------------------------//
 
 enum class DocumentStatus {
     ACTUAL,
@@ -59,6 +65,21 @@ enum class DocumentStatus {
 
 class SearchServer {
 public:
+//---------------------------------------------------------//
+    SearchServer() = default;
+    
+    SearchServer(const string& stop_words_str) {
+        for (const string& word : SplitIntoWords(stop_words_str)) {
+            stop_words_.insert(word);
+        }
+    }
+    template <typename TC>
+    SearchServer(const TC& container) {
+        for (const string& word : container) {
+            stop_words_.insert(word);
+        }
+    }
+//---------------------------------------------------------//
     void SetStopWords(const string& text) {
         for (const string& word : SplitIntoWords(text)) {
             stop_words_.insert(word);
@@ -75,7 +96,6 @@ public:
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
     }
 
-//------------------------------------ this task: ------------------------------------//
         template <typename DocumentCompare>
         vector<Document> FindTopDocuments(const string& raw_query, DocumentCompare document_check) const {
             const Query query = ParseQuery(raw_query);
@@ -100,8 +120,6 @@ public:
                 return status == required_status;
             });
         }
-
-//--------------------------------------------------------------------------------//
 
     int GetDocumentCount() const {
         return static_cast<int>(documents_.size());
@@ -241,33 +259,3 @@ private:
     }
 };
 
-// ==================== для примера =========================
-
-void PrintDocument(const Document& document) {
-    cout << "{ "s
-         << "document_id = "s << document.id << ", "s
-         << "relevance = "s << document.relevance << ", "s
-         << "rating = "s << document.rating
-         << " }"s << endl;
-}
-int main() {
-    SearchServer search_server;
-    search_server.SetStopWords("и в на"s);
-    search_server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
-    search_server.AddDocument(1, "пушистый кот пушистый хвост"s,       DocumentStatus::ACTUAL, {7, 2, 7});
-    search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
-    search_server.AddDocument(3, "ухоженный скворец евгений"s,         DocumentStatus::BANNED, {9});
-    cout << "ACTUAL by default:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
-        PrintDocument(document);
-    }
-    cout << "ACTUAL:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
-        PrintDocument(document);
-    }
-    cout << "Even ids:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
-        PrintDocument(document);
-    }
-    return 0;
-}
