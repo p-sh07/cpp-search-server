@@ -73,6 +73,7 @@ enum class DocumentStatus {
 class SearchServer {
 public:
     static inline constexpr int MAX_RESULT_DOCUMENT_COUNT = 5;
+    static inline constexpr int PRECISION_EPSILON = 1e-6;
     //====== Default constructor for some tests: =======
     SearchServer() = default;
     
@@ -113,7 +114,7 @@ public:
         
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
-            if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+            if (abs(lhs.relevance - rhs.relevance) < PRECISION_EPSILON) {
                 return lhs.rating > rhs.rating;
             } else {
                 return lhs.relevance > rhs.relevance;
@@ -153,9 +154,6 @@ private:
     
     bool IsStopWord(const string& word) const;
     
-    ///Переработанная функция SplitIntoWords()
-    ///Обработка ошибок парсинга проводится в этой функции, т.к. она проходит по каждому символу ввода(query & document & stop words).
-    ///Проходить по всем символам ввода еще раз в отдельной функции было бы излишне.
     vector<string> ParseStringInput(const string& text) const;
 
     vector<string> SplitIntoWordsNoStop(const string& text) const;

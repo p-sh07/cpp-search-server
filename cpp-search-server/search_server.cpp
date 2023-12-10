@@ -41,7 +41,7 @@ void SearchServer::AddDocument(int document_id, const string& document, Document
     }
     const auto words = SplitIntoWordsNoStop(document);
     if((documents_.count(document_id) > 0)) {
-        throw std::invalid_argument("Trying to add Document with DocID that already exists!");
+        throw std::invalid_argument("Trying to add Document with DocID that already exists in Server!");
     }
     const double inv_word_count = 1.0 / words.size();
     for (const string& word : words) {
@@ -95,7 +95,7 @@ std::tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const str
 bool SearchServer::IsStopWord(const string& word) const {
     return stop_words_.count(word) > 0;
 }
-
+///Now only throws on invalid symbols
 vector<string> SearchServer::ParseStringInput(const string& text) const {
     vector<string> words;
     string word;
@@ -107,28 +107,16 @@ vector<string> SearchServer::ParseStringInput(const string& text) const {
         } //terminate if invalid symbols detected
         
         if (c == ' ') {
-            if(prev_was_minus) {
-                throw std::invalid_argument("Trailing [-] at the end of a word in input!");
-            } else if (!word.empty()) {
+            if (!word.empty()) {
                 words.push_back(word);
                 word.clear();
-            }
-        } else if(c == '-') {
-            if(prev_was_minus) {
-                throw std::invalid_argument("Double [--] detected in input!");
-            } else {
-                prev_was_minus = true;
-                word += c;
             }
         } else {
             prev_was_minus = false;
             word += c;
         }
     }
-        //catch the trailing -
-    if(prev_was_minus) {
-        throw std::invalid_argument("Trailing [-] in input!");
-    } else if (!word.empty()) {
+    if (!word.empty()) {
         words.push_back(word);
     }
     return words;
@@ -145,10 +133,16 @@ vector<string> SearchServer::SplitIntoWordsNoStop(const string& text) const {
     return words;
 }
 
+///Query-specific error processing is now in this function
 SearchServer::QueryWord SearchServer::ParseQueryWord(string text) const {
     bool is_minus = false;
-    // Word shouldn't be empty
-    if (text[0] == '-') {
+    //check for incorrect minus positions
+    if(text.size() == 1 && text[0] == '-') {
+        throw std::invalid_argument("Floating minus [-] in query!");
+    } else if (text.size() > 1 && text[0] == '-') {
+        if(text[1] == '-') {
+            throw std::invalid_argument("Double minus [--] at the start of a word in query!");
+        }
         is_minus = true;
         text = text.substr(1);
     }

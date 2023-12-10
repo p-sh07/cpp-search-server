@@ -342,11 +342,12 @@ void TestErrorReporting() {
     const string content2 = "dog in the park"s;
     const vector<int> ratings2 = {1, 2, 3};
     
-    const string good_query = "cat"s;
+    const string good_query1 = "cat"s;
+    const string good_query2 = "in the -park"s;
+    const string good_query3 = "cat-neko"s;
     
-    const string bad_query1 = "cat-"s;
-    const string bad_query2 = "cat -"s;
-    const string bad_query3 = "cat --the"s;
+    const string bad_query1 = "cat -"s;
+    const string bad_query2 = "cat --the"s;
     const vector<string> plus_words_required{"cat"};
     {
         SearchServer server;
@@ -357,15 +358,46 @@ void TestErrorReporting() {
             
             server.MatchDocument(bad_query1, doc_id1);
             server.MatchDocument(bad_query2, doc_id1);
-            server.MatchDocument(bad_query3, doc_id1);
+            
+            server.MatchDocument(good_query1, doc_id1);
+            server.MatchDocument(good_query2, doc_id1);
+            server.MatchDocument(good_query3, doc_id1);
+            
         } catch (std::exception& ex){
             cerr << "Error in MatchDocument: " << ex.what() << endl;
         }
 
-        const auto match_return = server.MatchDocument(good_query, doc_id1);
+        const auto match_return = server.MatchDocument(good_query1, doc_id1);
         auto& words = std::get<0>(match_return);
         ASSERT_EQUAL(words[0], "cat"s);
     }
+    {
+        SearchServer server;
+        try{
+            server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
+            server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
+        } catch (std::exception& ex){
+            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+        }
+        try{
+            server.FindTopDocuments(bad_query1);
+        } catch (std::exception& ex){
+            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+        }
+        try{
+            server.FindTopDocuments(bad_query2);
+        } catch (std::exception& ex){
+            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+        }
+        try{
+            server.FindTopDocuments(good_query1);
+            server.FindTopDocuments(good_query2);
+        } catch (std::exception& ex){
+            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+        }
+
+    }
+    
 }
 // Функция TestSearchServer является точкой входа для запуска тестов
 void TestSearchServer() {
