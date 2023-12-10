@@ -1,6 +1,7 @@
 //
 //  unit_test_framework.hpp
 //  cpp-search-server
+//  Separate hpp file for all the unit-testing code
 //
 //  Created by Pavel Sh on 10.12.2023.
 //
@@ -16,6 +17,7 @@ using std::vector;
 using std::cerr;
 using std::endl;
 using std::operator""s;
+
 // ==================== unit tests ==========================
 void LogImpl(const string& str, const string& func_name, const string& file_name, int line_number) {
     cerr << file_name << "("s << line_number << "): "s;
@@ -356,7 +358,7 @@ void TestErrorReporting() {
             server.MatchDocument(bad_query1, doc_id1);
             server.MatchDocument(bad_query2, doc_id1);
             server.MatchDocument(bad_query3, doc_id1);
-        } catch (exception& ex){
+        } catch (std::exception& ex){
             cerr << "Error in MatchDocument: " << ex.what() << endl;
         }
 
@@ -385,7 +387,7 @@ void TestSearchServer() {
 // ==================== для примера =========================
 
 void PrintDocument(const Document& document) {
-    cout << "{ "s
+    std::cout << "{ "s
     << "document_id = "s << document.id << ", "s
     << "relevance = "s << document.relevance << ", "s
     << "rating = "s << document.rating << " }"s << endl;

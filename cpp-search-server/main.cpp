@@ -9,9 +9,7 @@
 #include "search_server.hpp"
 
 // P.S.: Код сервера + юнит тестов непоменрно разросся, поэтому был перенесен в отдельные файлы
-// [class SearchServer -> search_server.hpp]
-// (да, пока возможно этого не стоило делать, и сделано на данном этапе мягко говоря не идеально,
-// но так немного удобнее работать =) Надеюсь, на ревью это не повлияет!
+// [class SearchServer -> search_server.hpp & search_server.cpp]
 
 int main() {
     TestSearchServer();

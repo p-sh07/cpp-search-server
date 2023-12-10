@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C118E3A2B0D17830015F0B6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C118E392B0D17830015F0B6 /* main.cpp */; };
+		0CDC1D602B25CF75002F2A89 /* search_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC1D5F2B25CF75002F2A89 /* search_server.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +28,7 @@
 		0C118E392B0D17830015F0B6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0CDC1D5D2B259E84002F2A89 /* unit_test_framework.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = unit_test_framework.hpp; sourceTree = "<group>"; };
 		0CDC1D5E2B25A045002F2A89 /* search_server.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = search_server.hpp; sourceTree = "<group>"; };
+		0CDC1D5F2B25CF75002F2A89 /* search_server.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = search_server.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +48,7 @@
 				0C118E392B0D17830015F0B6 /* main.cpp */,
 				0CDC1D5D2B259E84002F2A89 /* unit_test_framework.hpp */,
 				0CDC1D5E2B25A045002F2A89 /* search_server.hpp */,
+				0CDC1D5F2B25CF75002F2A89 /* search_server.cpp */,
 			);
 			path = "cpp-search-server";
 			sourceTree = "<group>";
@@ -123,6 +126,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CDC1D602B25CF75002F2A89 /* search_server.cpp in Sources */,
 				0C118E3A2B0D17830015F0B6 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

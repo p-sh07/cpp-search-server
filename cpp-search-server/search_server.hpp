@@ -1,6 +1,7 @@
 //
 //  search_server.hpp
 //  cpp-search-server
+//  Contains some inline helper functions & template functions full definitions
 //
 //  Created by Pavel Sh on 10.12.2023.
 //
@@ -19,19 +20,24 @@
 #include <utility>
 #include <vector>
 
-using namespace std; //for now...
+using std::vector;
+using std::set;
+using std::map;
+using std::string;
 
-const int MAX_RESULT_DOCUMENT_COUNT = 5;
+using std::cerr;
+using std::endl;
 
-string ReadLine() {
+//====== Helper functions and structs: =======
+inline string ReadLine() {
     string s;
-    getline(cin, s);
+    getline(std::cin, s);
     return s;
 }
 
-int ReadLineWithNumber() {
+inline int ReadLineWithNumber() {
     int result;
-    cin >> result;
+    std::cin >> result;
     ReadLine();
     return result;
 }
@@ -49,13 +55,8 @@ set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
 
 struct Document {
     Document() = default;
-    
     Document(int id, double relevance, int rating)
-    : id(id)
-    , relevance(relevance)
-    , rating(rating) {
-    }
-    
+    : id(id), relevance(relevance), rating(rating) {}
     int id = 0;
     double relevance = 0.0;
     int rating = 0;
@@ -68,27 +69,26 @@ enum class DocumentStatus {
     REMOVED,
 };
 
+//**************** Class Search Server *************************************//
 class SearchServer {
 public:
-    //default constructor for some tests
-    SearchServer() {}
+    static inline constexpr int MAX_RESULT_DOCUMENT_COUNT = 5;
+    //====== Default constructor for some tests: =======
+    SearchServer() = default;
     
+    //====== Constructors & constructor helpers: =======
     explicit SearchServer(const string& stop_words_text)
-    : stop_words_(ParseStopWordsStr(stop_words_text))
-    {}
+    : stop_words_(ParseStopWordsStr(stop_words_text)){}
     
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words)
-    : stop_words_(ParseStopWords(stop_words))
-    {}
+    : stop_words_(ParseStopWords(stop_words)) {}
     
     //need this version to avoid checking each word twice in case of a string
-    set<string> ParseStopWordsStr(const string& stop_words_text) {
-        const vector<string> all_words = ParseStringInput(stop_words_text);
-        return MakeUniqueNonEmptyStrings(all_words);
-    }
+    set<string> ParseStopWordsStr(const string& stop_words_text);
+    
     template<typename StringContainer>
-    set<string> ParseStopWords(const StringContainer& stop_words) {
+    set<string> ParseStopWords(const StringContainer& stop_words)  {
         set<string> unique_words = MakeUniqueNonEmptyStrings(stop_words);
         //check all the words are valid:
         for(const auto& word : unique_words) {
@@ -97,26 +97,18 @@ public:
         return unique_words;
     }
     
-    void AddDocument(int document_id, const string& document, DocumentStatus status,
-                                   const vector<int>& ratings) {
-        if(document_id < 0) {
-            throw invalid_argument("Trying to add Document with negative DocID!");
-        }
-        const auto words = SplitIntoWordsNoStop(document);
-        if((documents_.count(document_id) > 0)) {
-            throw invalid_argument("Trying to add Document with DocID that already exists!");
-        }
-        const double inv_word_count = 1.0 / words.size();
-        for (const string& word : words) {
-            word_to_document_freqs_[word][document_id] += inv_word_count;
-        }
-        documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
-    }
+    //====== Get&Set functions: =========================
+    int GetDocumentCount() const;
+    int GetDocumentId(int doc_number) const;
     
+    void AddDocument(int document_id, const string& document, DocumentStatus status,
+                     const vector<int>& ratings);
+    
+    //====== Find Top Documents: ========================
     template <typename DocumentPredicate>
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
         const auto query = ParseQuery(raw_query);
-
+        
         auto matched_documents = FindAllDocuments(query, document_predicate);
         
         sort(matched_documents.begin(), matched_documents.end(),
@@ -133,49 +125,11 @@ public:
         return matched_documents;
     }
     
-    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
-        return FindTopDocuments(raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
-                                    return document_status == status;
-                                });
-    }
-    vector<Document> FindTopDocuments(const string& raw_query) const {
-        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
-    }
+    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const;
+    vector<Document> FindTopDocuments(const string& raw_query) const;
     
-    int GetDocumentCount() const {
-        return static_cast<int>(documents_.size());
-    }
-    int GetDocumentId(int doc_number) const {
-        if(doc_number < 0 || doc_number >= documents_.size()) {
-            throw out_of_range("Document number is out of range!");
-        }
-        auto nth_document = documents_.begin();
-        advance(nth_document, doc_number);
-        return nth_document->first; //returns id of nth document
-    }
-    
-    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) {
-        const auto query = ParseQuery(raw_query);
-        if(document_id < 0 || documents_.count(document_id) == 0) {
-            throw invalid_argument("Invalid Document Id!");
-        }
-        
-        tuple<vector<string>, DocumentStatus> result{{}, documents_.at(document_id).status};
-        vector<string>& matched_words = get<0>(result);
-        
-        //loop in minus words first
-        for (const string& word : query.minus_words) {
-            if (word_to_document_freqs_.count(word) && word_to_document_freqs_.at(word).count(document_id)) {
-                return result; //will return empty vector
-            }
-        } //if no minus words found, loop in plus words:
-        for (const string& word : query.plus_words) {
-            if (word_to_document_freqs_.count(word) && word_to_document_freqs_.at(word).count(document_id)) {
-                matched_words.push_back(word);
-            }
-        }
-        return result;
-    }
+    //====== Match Document: ============================
+    std::tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const;
     
 private:
     struct DocumentData {
@@ -186,64 +140,7 @@ private:
     map<string, map<int, double>> word_to_document_freqs_;
     map<int, DocumentData> documents_;
     
-    bool IsStopWord(const string& word) const {
-        return stop_words_.count(word) > 0;
-    }
-    
-    ///Переработанная функция SplitIntoWords()
-    ///Обработка ошибок парсинга проводится в этой функции, т.к. она проходит по каждому символу ввода(query & document & stop words).
-    ///Проходить по всем символам ввода еще раз в отдельной функции было бы излишне.
-    vector<string> ParseStringInput(const string& text) const {
-        vector<string> words;
-        string word;
-        bool prev_was_minus = false;
-        
-        for (const char c : text) {
-            if(0 <= static_cast<int>(c) && static_cast<int>(c) <= 31){
-                throw invalid_argument("Invalid symbols in input!");
-            } //terminate if invalid symbols detected
-            
-            if (c == ' ') {
-                if(prev_was_minus) {
-                    throw invalid_argument("Trailing [-] at the end of a word in input!");
-                } else if (!word.empty()) {
-                    words.push_back(word);
-                    word.clear();
-                }
-            } else if(c == '-') {
-                if(prev_was_minus) {
-                    throw invalid_argument("Double [--] detected in input!");
-                } else {
-                    prev_was_minus = true;
-                    word += c;
-                }
-            } else {
-                prev_was_minus = false;
-                word += c;
-            }
-        }
-            //catch the trailing -
-        if(prev_was_minus) {
-            throw invalid_argument("Trailing [-] in input!");
-        } else if (!word.empty()) {
-            words.push_back(word);
-        }
-        return words;
-    }
-
-    
-    vector<string> SplitIntoWordsNoStop(const string& text) const {
-        vector<string> words;
-        const auto split_text = ParseStringInput(text);
-        for (const string& word : split_text) {
-            if (!IsStopWord(word)) {
-                words.push_back(word);
-            }
-        }
-        return words;
-    }
-    
-    static int ComputeAverageRating(const vector<int>& ratings) {
+    static inline int ComputeAverageRating(const vector<int>& ratings) {
         if (ratings.empty()) {
             return 0;
         }
@@ -254,53 +151,36 @@ private:
         return rating_sum / static_cast<int>(ratings.size());
     }
     
+    bool IsStopWord(const string& word) const;
+    
+    ///Переработанная функция SplitIntoWords()
+    ///Обработка ошибок парсинга проводится в этой функции, т.к. она проходит по каждому символу ввода(query & document & stop words).
+    ///Проходить по всем символам ввода еще раз в отдельной функции было бы излишне.
+    vector<string> ParseStringInput(const string& text) const;
+
+    vector<string> SplitIntoWordsNoStop(const string& text) const;
+    
     struct QueryWord {
         string data;
         bool is_minus;
         bool is_stop;
     };
     
-    QueryWord ParseQueryWord(string text) const {
-        bool is_minus = false;
-        // Word shouldn't be empty
-        if (text[0] == '-') {
-            is_minus = true;
-            text = text.substr(1);
-        }
-        return {text, is_minus, IsStopWord(text)};
-    }
+    QueryWord ParseQueryWord(string text) const;
     
     struct Query {
         set<string> plus_words;
         set<string> minus_words;
     };
     
-    Query ParseQuery(const string& text) const {
-        Query query;
-        //returns pair bool, vector
-        const auto qwords = ParseStringInput(text);
-        
-        for (const string& word : qwords) {
-            const QueryWord query_word = ParseQueryWord(word);
-            if (!query_word.is_stop) {
-                if (query_word.is_minus) {
-                    query.minus_words.insert(query_word.data);
-                } else {
-                    query.plus_words.insert(query_word.data);
-                }
-            }
-        }
-        return query;
-    }
+    Query ParseQuery(const string& text) const;
     
     // Existence required
-    double ComputeWordInverseDocumentFreq(const string& word) const {
-        return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
-    }
+    double ComputeWordInverseDocumentFreq(const string& word) const;
     
     template <typename DocumentPredicate>
-    vector<Document> FindAllDocuments(const Query& query,
-                                      DocumentPredicate document_predicate) const {
+    vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
+        
         map<int, double> document_to_relevance;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
