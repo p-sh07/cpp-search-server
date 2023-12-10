@@ -1,21 +1,10 @@
 //
 //  04.Базовые понятия С++ и STL
 //  Тема 15.Обработка ошибок. Исключения
-//  Задача 03.Использование std::optional (+фреймворк юнит тестов)
+//  Задача 06.Обработка ошибок в поисковой системе
 //
 //  Created by Pavel Sh on 10.12.2023.
 //
-
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <map>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "unit_test_framework.hpp"
 #include "search_server.hpp"
 
@@ -28,6 +17,6 @@ int main() {
     TestSearchServer();
     // Если вы видите эту строку, значит все тесты прошли успешно
     std::cerr << "Search server testing finished"s << endl;
-    OptionalUseExample();
+    //OptionalUseExample();
     
 }
