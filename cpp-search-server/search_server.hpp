@@ -21,39 +21,18 @@
 #include <utility>
 #include <vector>
 
+#include "helper_functions.hpp"
+
 using std::vector;
 using std::set;
 using std::map;
 using std::string;
 
+using std::ostream;
 using std::cerr;
 using std::endl;
 
-//====== Helper functions and structs: =======
-inline string ReadLine() {
-    string s;
-    getline(std::cin, s);
-    return s;
-}
-
-inline int ReadLineWithNumber() {
-    int result;
-    std::cin >> result;
-    ReadLine();
-    return result;
-}
-
-template <typename StringContainer>
-set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
-    set<string> non_empty_strings;
-    for (const string& str : strings) {
-        if (!str.empty()) {
-            non_empty_strings.insert(str);
-        }
-    }
-    return non_empty_strings;
-}
-
+//====== Helper structs & functions: =======
 struct Document {
     Document() = default;
     Document(int id, double relevance, int rating)
@@ -69,6 +48,33 @@ enum class DocumentStatus {
     BANNED,
     REMOVED,
 };
+
+void PrintDocument(const Document& document) {
+    cout << "{ "s
+         << "document_id = "s << document.id << ", "s
+         << "relevance = "s << document.relevance << ", "s
+         << "rating = "s << document.rating
+         << " }"s << endl;
+}
+void PrintMatchDocumentResult(int document_id, const vector<string>& words, DocumentStatus status) {
+    cout << "{ "s
+         << "document_id = "s << document_id << ", "s
+         << "status = "s << static_cast<int>(status) << ", "s
+         << "words ="s;
+    for (const string& word : words) {
+        cout << ' ' << word;
+    }
+    cout << "}"s << endl;
+}
+ostream& operator<<(ostream& out, const Document& document) {
+    out << "{ "s
+        << "document_id = "s << document.id << ", "s
+        << "relevance = "s << document.relevance << ", "s
+        << "rating = "s << document.rating
+        << " }"s;
+    return out;
+}
+
 
 //**************** Class Search Server *************************************//
 class SearchServer {
@@ -146,7 +152,6 @@ private:
         if (ratings.empty()) {
             return 0;
         }
-        //Дмитрий, привет! Я считаю, здесь вполне можно было пометить серым ("можно лучше"), а не красным, ибо спорный вопрос)) Да, на две строчки стало короче, но ради одного этого accumulate целый лишний заголовочный файл <numeric> пришлось подключать >_<)
         int rating_sum = std::accumulate(ratings.begin(), ratings.end(), 0);
         return rating_sum / static_cast<int>(ratings.size());
     }
@@ -209,5 +214,42 @@ private:
         return matched_documents;
     }
 };
+
+//other:
+
+void AddDocument(SearchServer& search_server, int document_id, const string& document, DocumentStatus status,
+                 const vector<int>& ratings) {
+    try {
+        search_server.AddDocument(document_id, document, status, ratings);
+    } catch (const invalid_argument& e) {
+        cout << "Ошибка добавления документа "s << document_id << ": "s << e.what() << endl;
+    }
+}
+
+void FindTopDocuments(const SearchServer& search_server, const string& raw_query) {
+    cout << "Результаты поиска по запросу: "s << raw_query << endl;
+    try {
+        for (const Document& document : search_server.FindTopDocuments(raw_query)) {
+            PrintDocument(document);
+        }
+    } catch (const invalid_argument& e) {
+        cout << "Ошибка поиска: "s << e.what() << endl;
+    }
+}
+
+void MatchDocuments(const SearchServer& search_server, const string& query) {
+    try {
+        cout << "Матчинг документов по запросу: "s << query << endl;
+        const int document_count = search_server.GetDocumentCount();
+        for (int index = 0; index < document_count; ++index) {
+            const int document_id = search_server.GetDocumentId(index);
+            const auto [words, status] = search_server.MatchDocument(query, document_id);
+            PrintMatchDocumentResult(document_id, words, status);
+        }
+    } catch (const invalid_argument& e) {
+        cout << "Ошибка матчинга документов на запрос "s << query << ": "s << e.what() << endl;
+    }
+}
+
 
 #endif /* search_server_h */
