@@ -48,7 +48,7 @@ public:
             if(std::distance(begin, end) < page_size) {
                 pages_.push_back({begin, end});
                 break;
-            }
+            
             pages_.push_back({begin, std::next(begin, page_size)});
         }
     }

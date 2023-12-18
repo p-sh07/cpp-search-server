@@ -28,6 +28,7 @@
 		0C118E392B0D17830015F0B6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0C257A712B2C63F5002182A2 /* paginator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = paginator.hpp; sourceTree = "<group>"; };
 		0C257A732B2C64B3002182A2 /* helper_functions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helper_functions.hpp; sourceTree = "<group>"; };
+		0CCC051A2B303DCB0099BAFD /* request_queue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = request_queue.hpp; sourceTree = "<group>"; };
 		0CDC1D5D2B259E84002F2A89 /* unit_test_framework.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = unit_test_framework.hpp; sourceTree = "<group>"; };
 		0CDC1D5E2B25A045002F2A89 /* search_server.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = search_server.hpp; sourceTree = "<group>"; };
 		0CDC1D5F2B25CF75002F2A89 /* search_server.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = search_server.cpp; sourceTree = "<group>"; };
@@ -49,6 +50,7 @@
 			children = (
 				0C118E392B0D17830015F0B6 /* main.cpp */,
 				0C257A712B2C63F5002182A2 /* paginator.hpp */,
+				0CCC051A2B303DCB0099BAFD /* request_queue.hpp */,
 				0C257A732B2C64B3002182A2 /* helper_functions.hpp */,
 				0CDC1D5D2B259E84002F2A89 /* unit_test_framework.hpp */,
 				0CDC1D5E2B25A045002F2A89 /* search_server.hpp */,
