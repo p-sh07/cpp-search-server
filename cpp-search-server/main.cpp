@@ -1,12 +1,15 @@
-//
-//  04.Базовые понятия С++ и STL
-//
-//  Created by Pavel Sh on 10.12.2023.
-//
-#include "unit_test_framework.hpp"
-#include "search_server.hpp"
+#include <iostream>
 
-using namespace std;
+#include "document.h"
+#include "search_server.h"
+#include "request_queue.h"
+#include "paginator.h"
+#include "unit_test_framework.h"
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::operator""s;
 
 template <typename Container>
 auto Paginate(const Container& c, size_t page_size) {
@@ -15,8 +18,7 @@ auto Paginate(const Container& c, size_t page_size) {
 
 int main() {
     TestSearchServer();
-    // Если вы видите эту строку, значит все тесты прошли успешно
-    std::cerr << "Search server testing finished"s << endl;
+    cerr << "Search server testing finished"s << endl;
     //OptionalUseExample();
     
     SearchServer search_server("and with"s);

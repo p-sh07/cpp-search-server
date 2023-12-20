@@ -1,15 +1,4 @@
-//
-//  unit_test_framework.hpp
-//  cpp-search-server
-//  Separate hpp file for all the unit-testing code
-//
-//  Created by Pavel Sh on 10.12.2023.
-//
-
-#ifndef unit_test_framework_h
-#define unit_test_framework_h
-
-#include "search_server.hpp"
+#include "unit_test_framework.h"
 
 using std::string;
 using std::vector;
@@ -18,13 +7,10 @@ using std::cerr;
 using std::endl;
 using std::operator""s;
 
-// ==================== unit tests ==========================
 void LogImpl(const string& str, const string& func_name, const string& file_name, int line_number) {
     cerr << file_name << "("s << line_number << "): "s;
     cerr << func_name << ": "s << str << endl;
 }
-
-#define LOG(expr) LogImpl(#expr, __FUNCTION__, __FILE__, __LINE__)
 
 void AssertImpl(const bool t, const string& t_str, const string& file,
                 const string& func, unsigned line, const string& hint) {
@@ -40,11 +26,6 @@ void AssertImpl(const bool t, const string& t_str, const string& file,
         //        abort();
     }
 }
-
-#define ASSERT(a) AssertImpl((a), #a,  __FILE__, __FUNCTION__, __LINE__, ""s)
-
-#define ASSERT_HINT(a, hint) AssertImpl((a), #a, __FILE__, __FUNCTION__, __LINE__, (hint))
-
 
 template <typename T, typename U>
 void AssertEqualImpl(const T& t, const U& u, const string& t_str, const string& u_str, const string& file,
@@ -62,23 +43,14 @@ void AssertEqualImpl(const T& t, const U& u, const string& t_str, const string& 
     }
 }
 
-#define ASSERT_EQUAL(a, b) AssertEqualImpl((a), (b), #a, #b, __FILE__, __FUNCTION__, __LINE__, ""s)
-
-#define ASSERT_EQUAL_HINT(a, b, hint) AssertEqualImpl((a), (b), #a, #b, __FILE__, __FUNCTION__, __LINE__, (hint))
-
 template <typename TestFunc>
 void RunTestImpl(const TestFunc& func, const string& test_name) {
     func();
     cerr << test_name << " OK"s << endl;
 }
 
-#define RUN_TEST(func) RunTestImpl(func, #func)
 // -------- Начало модульных тестов поисковой системы ----------
 
-/*
- Разместите код остальных тестов здесь
- */
-//Добавление документов. Добавленный документ должен находиться по поисковому запросу, который содержит слова из документа.
 void TestDocumentAdd() {
     const int doc_id = 42;
     const string content = "cat in the city"s;
@@ -106,7 +78,7 @@ void TestDocumentAdd() {
                     "There should be no documents found with the word [dog]"s);
     }
 }
-// Тест проверяет, что поисковая система исключает стоп-слова при добавлении документов
+
 void TestExcludeStopWordsFromAddedDocumentContent() {
     const int doc_id = 42;
     const string content = "cat in the city"s;
@@ -127,7 +99,7 @@ void TestExcludeStopWordsFromAddedDocumentContent() {
                     "Stop words must be excluded from documents"s);
     }
 }
-//Поддержка минус-слов. Документы, содержащие минус-слова из поискового запроса, не должны включаться в результаты поиска.
+
 void TestMinusWords() {
     const int doc_id1 = 41;
     const string content1 = "cat in the city"s;
@@ -146,7 +118,7 @@ void TestMinusWords() {
         ASSERT_EQUAL(doc0.id, doc_id1);
     }
 }
-//Соответствие документов поисковому запросу. При этом должны быть возвращены все слова из поискового запроса, присутствующие в документе. Если есть соответствие хотя бы по одному минус-слову, должен возвращаться пустой список слов.
+
 void TestMatchDocumentReturn() {
     const int doc_id1 = 41;
     const string content1 = "cat in the city"s;
@@ -198,7 +170,7 @@ void TestMatchDocumentReturn() {
         ASSERT_HINT(status == required_status, "MatchDocument replaces document status!");
     }
 }
-//Сортировка найденных документов по релевантности. Возвращаемые при поиске документов результаты должны быть отсортированы в порядке убывания релевантности.
+
 void TestDocumentSortByRelevance() {
     const int doc_id1 = 41;
     const string content1 = "cat in the city"s;
@@ -222,7 +194,7 @@ void TestDocumentSortByRelevance() {
         ASSERT_HINT(doc0.relevance > doc1.relevance, "Return documents should be sorted by decreasing relevance"s);
     }
 }
-//Вычисление рейтинга документов. Рейтинг добавленного документа равен среднему арифметическому оценок документа.
+
 void TestRatingCompute() {
     const int doc_id1 = 41;
     const string content1 = "cat in the city"s;
@@ -246,7 +218,7 @@ void TestRatingCompute() {
         ASSERT_EQUAL(doc1.rating, 3);
     }
 }
-//Фильтрация результатов поиска с использованием предиката, задаваемого пользователем.
+
 void TestUserDefinedPredicateFilter(){
     {
         {//return by status
@@ -284,7 +256,7 @@ void TestUserDefinedPredicateFilter(){
         
     }
 }
-//Поиск документов, имеющих заданный статус.
+
 void TestStatusFilter() {
     SearchServer search_server("и в на"s);
     search_server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {1});
@@ -308,7 +280,7 @@ void TestStatusFilter() {
         ASSERT_EQUAL_HINT(doc0.id, 2, "Failed to return IRRELEVANT");
     }
 }
-//Корректное вычисление релевантности найденных документов.
+
 void TestRelevanceCompute() {
     const int doc_id = 41;
     const string content = "cat in the city"s;
@@ -349,57 +321,34 @@ void TestErrorReporting() {
     const string bad_query1 = "cat -"s;
     const string bad_query2 = "cat --the"s;
     const vector<string> plus_words_required{"cat"};
-    {
-        SearchServer server;
-        try{
-            server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
-            server.AddDocument(doc_id1, content2, DocumentStatus::BANNED, ratings2);
-            server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
-            
-            server.MatchDocument(bad_query1, doc_id1);
-            server.MatchDocument(bad_query2, doc_id1);
-            
-            server.MatchDocument(good_query1, doc_id1);
-            server.MatchDocument(good_query2, doc_id1);
-            server.MatchDocument(good_query3, doc_id1);
-            
-        } catch (std::exception& ex){
-            cerr << "Error in MatchDocument: " << ex.what() << endl;
-        }
-
-        const auto match_return = server.MatchDocument(good_query1, doc_id1);
-        auto& words = std::get<0>(match_return);
-        ASSERT_EQUAL(words[0], "cat"s);
-    }
+    
     {
         SearchServer server;
         try{
             server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
             server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
         } catch (std::exception& ex){
-            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+            ASSERT_EQUAL(ex.what(), INVALID_ID_MSG);
         }
         try{
             server.FindTopDocuments(bad_query1);
         } catch (std::exception& ex){
-            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+            ASSERT_EQUAL(ex.what(), QUERY_WRONG_FORMAT_MSG);
         }
         try{
             server.FindTopDocuments(bad_query2);
         } catch (std::exception& ex){
-            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+            ASSERT_EQUAL(ex.what(), QUERY_WRONG_FORMAT_MSG);
         }
         try{
             server.FindTopDocuments(good_query1);
             server.FindTopDocuments(good_query2);
         } catch (std::exception& ex){
-            cerr << "Error in FindTopDocuments: " << ex.what() << endl;
+            ASSERT_HINT(false, "Error thrown by FindTopDocuments for a valid query"s);
         }
-
     }
-    
 }
-// Функция TestSearchServer является точкой входа для запуска тестов
+
 void TestSearchServer() {
     // Не забудьте вызывать остальные тесты здесь
     RUN_TEST(TestDocumentAdd);
@@ -413,41 +362,4 @@ void TestSearchServer() {
     RUN_TEST(TestRelevanceCompute);
     RUN_TEST(TestErrorReporting);
 }
-
 // --------- Окончание модульных тестов поисковой системы -----------
-
-// ==================== для примера =========================
-
-void PrintDocument(const Document& document) {
-    std::cout << "{ "s
-    << "document_id = "s << document.id << ", "s
-    << "relevance = "s << document.relevance << ", "s
-    << "rating = "s << document.rating << " }"s << endl;
-}
-/*
-void OptionalUseExample() {
-    SearchServer search_server("и в на"s);
-    // Явно игнорируем результат метода AddDocument, чтобы избежать предупреждения
-    // о неиспользуемом результате его вызова
-    (void) search_server.AddDocument(1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, {7, 2, 7});
-    if (!search_server.AddDocument(1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, {1, 2})) {
-        cout << "Документ не был добавлен, так как его id совпадает с уже имеющимся"s << endl;
-    }
-    if (!search_server.AddDocument(-1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, {1, 2})) {
-        cout << "Документ не был добавлен, так как его id отрицательный"s << endl;
-    }
-    if (!search_server.AddDocument(3, "большой пёс скво\x12рец"s, DocumentStatus::ACTUAL, {1, 3, 2})) {
-        cout << "Документ не был добавлен, так как содержит спецсимволы"s << endl;
-    }
-    if (const auto documents = search_server.FindTopDocuments("--пушистый"s)) {
-        for (const Document& document : *documents) {
-            PrintDocument(document);
-        }
-    } else {
-        cout << "Ошибка в поисковом запросе"s << endl;
-    }
-}
-*/
-
-
-#endif /* unit_test_framework_h */
