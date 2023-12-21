@@ -12,11 +12,13 @@ using std::endl;
 //**************** Class Search Server ****************//
 //====== Constructors ==============================
 
+SearchServer::SearchServer(const std::string& stop_words_text)
+: stop_words_(ParseStopWordsStr(stop_words_text)){}
+
 set<string> SearchServer::ParseStopWordsStr(const string& stop_words_text) {
    const vector<string> all_words = ParseStringInput(stop_words_text);
    return MakeUniqueNonEmptyStrings(all_words);
 }
-
 
 //====== Get&Set functions: =========================
 int SearchServer::GetDocumentCount() const {
@@ -58,12 +60,12 @@ vector<Document> SearchServer::FindTopDocuments(const string& raw_query) const {
     return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
 }
 
-
 //====== Match Document: ============================
 std::tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const string& raw_query, int document_id) const {
     const auto query = ParseQuery(raw_query);
+    
     if(document_id < 0 || documents_.count(document_id) == 0) {
-        throw std::invalid_argument(QUERY_INVALID_DOCID_MSG);
+        throw std::invalid_argument(INVALID_ID_MSG);
     }
     
     std::tuple<vector<string>, DocumentStatus> result{{}, documents_.at(document_id).status};
@@ -82,7 +84,6 @@ std::tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const str
     }
     return result;
 }
-
 
 //====== Private Methods: ============================
 bool SearchServer::IsStopWord(const string& word) const {
@@ -160,4 +161,13 @@ SearchServer::Query SearchServer::ParseQuery(const string& text) const {
 double SearchServer::ComputeWordInverseDocumentFreq(const string& word) const {
     return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
 }
+
+inline int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
+    if (ratings.empty()) {
+        return 0;
+    }
+    int rating_sum = std::accumulate(ratings.begin(), ratings.end(), 0);
+    return rating_sum / static_cast<int>(ratings.size());
+}
+
 //************* End of Class Search Server *************//

@@ -56,7 +56,7 @@ void TestDocumentAdd() {
     const string content = "cat in the city"s;
     const vector<int> ratings = {1, 2, 3};
     {
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
         const auto found_docs = server.FindTopDocuments("cat"s);
         ASSERT_EQUAL(found_docs.size(), 1u);
@@ -64,7 +64,7 @@ void TestDocumentAdd() {
         ASSERT_EQUAL(doc0.id, doc_id);
     }
     {
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
         const auto found_docs = server.FindTopDocuments("city"s);
         ASSERT_EQUAL(found_docs.size(), 1u);
@@ -72,7 +72,7 @@ void TestDocumentAdd() {
         ASSERT_EQUAL(doc0.id, doc_id);
     }
     {
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
         ASSERT_HINT(server.FindTopDocuments("dog"s).empty(),
                     "There should be no documents found with the word [dog]"s);
@@ -84,7 +84,7 @@ void TestExcludeStopWordsFromAddedDocumentContent() {
     const string content = "cat in the city"s;
     const vector<int> ratings = {1, 2, 3};
     {
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
         const auto found_docs = server.FindTopDocuments("in"s);
         ASSERT_EQUAL(found_docs.size(), 1u);
@@ -109,7 +109,7 @@ void TestMinusWords() {
     const string content2 = "dog in the park"s;
     const vector<int> ratings2 = {1, 2, 3};
     {
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
         server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
         const auto found_docs = server.FindTopDocuments("in -park"s);
@@ -131,7 +131,7 @@ void TestMatchDocumentReturn() {
     const string query = "cat"s;
     const vector<string> plus_words_required{"cat"};
     {//return of correct words
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
         server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
         const auto found_docs = server.FindTopDocuments(query);
@@ -144,7 +144,7 @@ void TestMatchDocumentReturn() {
     }
     const string query2 = "dog -park"s;
     {//return empty when minus word present
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
         server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
         ASSERT(server.FindTopDocuments(query2).empty());
@@ -155,7 +155,7 @@ void TestMatchDocumentReturn() {
     const vector<string> plus_words_required3{"dog"};
     const DocumentStatus required_status = DocumentStatus::BANNED;
     {//return of correct words with doc status other than ACTUAL & returns correct status
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
         server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
         const auto found_docs = server.FindTopDocuments(query3, DocumentStatus::BANNED);
@@ -182,7 +182,7 @@ void TestDocumentSortByRelevance() {
     
     const string query = "in the city"s;
     {//return in correct order
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
         server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
         const auto found_docs = server.FindTopDocuments(query);
@@ -206,7 +206,7 @@ void TestRatingCompute() {
     
     const string query = "in the city"s;
     {//return of correct retings
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
         server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
         const auto found_docs = server.FindTopDocuments(query);
@@ -292,7 +292,7 @@ void TestRelevanceCompute() {
     
     
     {
-        SearchServer server;
+        SearchServer server("a"s);
         server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
         server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
         const auto found_docs = server.FindTopDocuments("cat"s);
@@ -320,10 +320,10 @@ void TestErrorReporting() {
     
     const string bad_query1 = "cat -"s;
     const string bad_query2 = "cat --the"s;
-    const vector<string> plus_words_required{"cat"};
+    const vector<string> plus_words_required{"cat"s};
     
     {
-        SearchServer server;
+        SearchServer server("a"s);
         try{
             server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
             server.AddDocument(doc_id2, content2, DocumentStatus::BANNED, ratings2);
